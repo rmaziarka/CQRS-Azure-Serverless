@@ -1,0 +1,26 @@
+POST http://localhost:7071/api/CreateEstate
+Content-Type: application/json
+
+{
+    "companyId": "asdasd",
+    "name": "Green Tower B",
+    "location": "Strzegomska 36, 53-611 Wrocław",
+    "price": 100000000,
+    "floors": [{
+        "floorNumber": "1",
+        "size": 400,
+        "numberOfRooms": 20
+    },{
+        "floorNumber": "2",
+        "size": 400,
+        "numberOfRooms": 15
+    },{
+        "floorNumber": "3",
+        "size": 300,
+        "numberOfRooms": 15
+    },{
+        "floorNumber": "4",
+        "size": 300,
+        "numberOfRooms": 10
+    }]
+}
