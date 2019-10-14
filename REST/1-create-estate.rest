@@ -2,8 +2,8 @@ POST http://localhost:7071/api/CreateEstate
 Content-Type: application/json
 
 {
-    "companyId": "asdasd",
-    "name": "Green Tower B",
+    "companyId": "4a1dbe73-d83c-487b-9c60-db7fbb4a2ba0",
+    "name": "Green Tower A",
     "location": "Strzegomska 36, 53-611 Wrocław",
     "price": 100000000,
     "floors": [{
