@@ -1,0 +1,36 @@
+trigger: 
+- master
+
+pool:
+    vmImage: 'ubuntu-latest'
+
+variables:
+    buildConfiguration: 'Release'
+
+steps:
+- script: dotnet restore
+  displayName: 'Restore'
+
+- script: dotnet build --configuration $(buildConfiguration)
+  displayName: 'Build'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: publish
+    arguments: '--configuration $(buildConfiguration) --output publish_output'
+    projects: '**/*.csproj'
+    publishWebProjects: false
+    modifyOUtputPath: true
+  displayName: 'Publish'
+
+#- task: ArchiveFiles@2
+#  displayName: "Zip files"
+#  inputs:
+#    rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output"
+#    includeRootFolder: false
+#    archiveFile: "$(System.DefaultWorkingDirectory)/build$(Build.BuildId).zip"
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathtoPublish: "$(System.DefaultWorkingDirectory)/publish_output"
+    artifactName: 'drop'
+  displayName: 'Publish artifact'

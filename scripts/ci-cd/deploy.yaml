@@ -1,0 +1,25 @@
+pool:
+    vmImage: 'ubuntu-latest'
+
+variables:
+    buildConfiguration: 'Release'
+
+steps:
+
+- task: DownloadPipelineArtifact@2
+  inputs:
+    buildType: 'specific'
+    buildVersionToDownload: latest
+    project: '$(System.TeamProjectId)'
+    specificBuildWithTriggering: true
+    downloadPath: '$(System.ArtifactsDirectory)'
+    artifactName: 'drop'
+
+
+- task: AzureFunctionApp@1
+  inputs:
+    azureSubscription: 'Visual Studio Enterprise – MPN (ba432108-c17b-4b79-b100-fa0ef8e3fb1b)'
+    appType: 'functionApp'
+    appName: 'cqrs-azure-serverless-realestate'
+    package: '$(System.ArtifactsDirectory)/**/*.zip'
+    deploymentMethod: 'auto'
