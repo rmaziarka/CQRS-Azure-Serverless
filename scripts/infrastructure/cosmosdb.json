@@ -165,6 +165,18 @@
                     }
                 }
             }
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "name": "cqrsazureserverless/AzureCosmosDBConnection",
+            "apiVersion": "2015-06-01",
+            "properties": {
+                "contentType": "text/plain",
+                "value": "[listConnectionStrings(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName')), '2015-11-06').connectionStrings[0].connectionString]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/', variables('accountName'))]"
+            ]
         }
     ]
 }
