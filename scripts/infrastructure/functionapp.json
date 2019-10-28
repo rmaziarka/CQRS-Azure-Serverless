@@ -7,7 +7,7 @@
       "appServicePlanName": "[variables('sharedServicesName')]",
       "applicationInsightsName": "[variables('sharedServicesName')]",
       "keyVaultName": "[variables('sharedServicesName')]",
-      "functionAppName": "[concat(toLower(resourceGroup().name),'-','realeastate')]",
+      "functionAppName": "[concat(toLower(resourceGroup().name),'-','realestate')]",
       "keyVaultStorageAccountSecretName": "StorageAccountConnectionString",
       "keyVaultCosmosDBSecretName": "AzureCosmosDBConnection"
     },
@@ -73,7 +73,8 @@
             "type": "config",
             "name": "appsettings",         
             "dependsOn": [
-              "[resourceId('Microsoft.Web/sites', variables('functionAppName'))]"
+              "[resourceId('Microsoft.Web/sites', variables('functionAppName'))]",
+              "[resourceId('Microsoft.KeyVault/vaults/accessPolicies', variables('keyVaultName'), 'add')]"
             ],
             "properties": {
               "AzureWebJobsDashboard": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), variables('keyVaultStorageAccountSecretName')),'2015-06-01').secretUriWithVersion, ')')]",
