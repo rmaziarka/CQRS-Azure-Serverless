@@ -1,138 +1,114 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {
-      "appName": {
-        "type": "string",
-        "metadata": {
-          "description": "The name of the function app that you wish to create."
-        }
-      },
-      "storageAccountName": {
-        "type": "string",
-        "metadata": {
-          "description": "The name of the storage account that you wish to create."
-        }
-      },
-      "storageAccountType": {
-        "type": "string",
-        "defaultValue": "Standard_LRS",
-        "allowedValues": ["Standard_LRS", "Standard_GRS", "Standard_RAGRS"],
-        "metadata": {
-          "description": "Storage Account type"
-        }
-      },
-      "location": {
-        "type": "string",
-        "defaultValue": "[resourceGroup().location]",
-        "metadata": {
-          "description": "Location for all resources."
-        }
-      },
-      "runtime": {
-        "type": "string",
-        "defaultValue": "dotnet",
-        "allowedValues": ["node", "dotnet", "java"],
-        "metadata": {
-          "description": "The language worker runtime to load in the function app."
-        }
-      }
-    },
     "variables": {
-      "functionAppName": "[parameters('appName')]",
-      "hostingPlanName": "[parameters('appName')]",
-      "applicationInsightsName": "[parameters('appName')]",
-      "storageAccountName": "[parameters('storageAccountName')]",
-      "storageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
-      "functionWorkerRuntime": "[parameters('runtime')]"
+      "location": "[resourceGroup().location]",
+      "sharedServicesName": "[replace(toLower(resourceGroup().name),'-', '')]",
+      "appServicePlanName": "[variables('sharedServicesName')]",
+      "applicationInsightsName": "[variables('sharedServicesName')]",
+      "keyVaultName": "[variables('sharedServicesName')]",
+      "functionAppName": "[concat(toLower(resourceGroup().name),'-','realeastate')]",
+      "keyVaultStorageAccountSecretName": "StorageAccountConnectionString",
+      "keyVaultCosmosDBSecretName": "AzureCosmosDBConnection"
     },
     "resources": [
       {
-        "type": "Microsoft.Storage/storageAccounts",
-        "name": "[variables('storageAccountName')]",
-        "apiVersion": "2016-12-01",
-        "location": "[parameters('location')]",
-        "kind": "Storage",
-        "sku": {
-          "name": "[parameters('storageAccountType')]"
-        }
-      },
-      {
         "type": "Microsoft.Web/serverfarms",
         "apiVersion": "2018-02-01",
-        "name": "[variables('hostingPlanName')]",
-        "location": "[parameters('location')]",
+        "name": "[variables('appServicePlanName')]",
+        "location": "[variables('location')]",
         "sku": {
           "name": "Y1",
           "tier": "Dynamic"
         },
         "properties": {
-          "name": "[variables('hostingPlanName')]",
-          "computeMode": "Dynamic"
+          "name": "[variables('appServicePlanName')]",
+          "computeMode": "Dynamic",
+          "immutabilityPeriodSinceCreationInDays" : 10
         }
       },
       {
-        "apiVersion": "2015-08-01",
-        "type": "Microsoft.Web/sites",
-        "name": "[variables('functionAppName')]",
-        "location": "[parameters('location')]",
-        "kind": "functionapp",
-        "dependsOn": [
-          "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
-          "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
-        ],
-        "properties": {
-          "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
-          "siteConfig": {
-            "appSettings": [
-              {
-                "name": "AzureWebJobsDashboard",
-                "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2015-05-01-preview').key1)]"
-              },
-              {
-                "name": "AzureWebJobsStorage",
-                "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2015-05-01-preview').key1)]"
-              },
-              {
-                "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
-                "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2015-05-01-preview').key1)]"
-              },
-              {
-                "name": "WEBSITE_CONTENTSHARE",
-                "value": "[toLower(variables('functionAppName'))]"
-              },
-              {
-                "name": "FUNCTIONS_EXTENSION_VERSION",
-                "value": "~2"
-              },
-              {
-                "name": "WEBSITE_NODE_DEFAULT_VERSION",
-                "value": "8.11.1"
-              },
-              {
-                "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                "value": "[reference(resourceId('microsoft.insights/components/', variables('applicationInsightsName')), '2015-05-01').InstrumentationKey]"
-              },
-              {
-                "name": "FUNCTIONS_WORKER_RUNTIME",
-                "value": "[variables('functionWorkerRuntime')]"
-              }
-            ]
-          }
-        }
-      },
-      {
-        "apiVersion": "2018-05-01-preview",
+        "apiVersion": "2015-05-01",
+        "kind": "applicationInsights",
         "name": "[variables('applicationInsightsName')]",
         "type": "microsoft.insights/components",
-        "location": "[parameters('location')]",
+        "location": "[variables('location')]",
         "tags": {
           "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('applicationInsightsName'))]": "Resource"
         },
         "properties": {
           "ApplicationId": "[variables('applicationInsightsName')]",
-          "Request_Source": "IbizaWebAppExtensionCreate"
+          "Application_Type": "web"
         }
+      },
+      {
+        "apiVersion": "2016-08-01",
+        "type": "Microsoft.Web/sites",
+        "name": "[variables('functionAppName')]",
+        "location": "[variables('location')]",
+        "kind": "functionapp",
+        "properties": {
+          "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]"
+        },
+        "identity": {
+            "type": "SystemAssigned"
+        },
+        "dependsOn": [
+          "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]"
+        ],
+        "resources":[
+          {
+            "apiVersion": "2015-08-01",
+            "name": "web",
+            "type": "config",
+            "dependsOn": [
+              "[resourceId('Microsoft.Web/Sites', variables('functionAppName'))]"
+            ],
+            "properties": {
+              "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]"
+            }
+          },
+          {
+            "apiVersion": "2015-08-01",
+            "type": "config",
+            "name": "appsettings",         
+            "dependsOn": [
+              "[resourceId('Microsoft.Web/sites', variables('functionAppName'))]"
+            ],
+            "properties": {
+              "AzureWebJobsDashboard": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), variables('keyVaultStorageAccountSecretName')),'2015-06-01').secretUriWithVersion, ')')]",
+              "AzureWebJobsStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), variables('keyVaultStorageAccountSecretName')),'2015-06-01').secretUriWithVersion, ')')]",
+              "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), variables('keyVaultStorageAccountSecretName')),'2015-06-01').secretUriWithVersion, ')')]",
+              "AzureCosmosDBConnection": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), variables('keyVaultCosmosDBSecretName')),'2015-06-01').secretUriWithVersion, ')')]",
+              "WEBSITE_CONTENTSHARE": "[toLower(variables('functionAppName'))]",
+              "FUNCTIONS_EXTENSION_VERSION": "~2",
+              "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('applicationInsightsName')), '2015-05-01').InstrumentationKey]",
+              "FUNCTIONS_WORKER_RUNTIME": "dotnet"
+            }
+          }
+        ]
+      },
+      {
+          "type": "Microsoft.KeyVault/vaults/accessPolicies",
+          "name": "[concat(variables('keyVaultName'), '/add')]",
+          "apiVersion": "2016-10-01",
+          "properties": {
+              "accessPolicies": [
+                  {
+                      "objectId": "[reference(variables('functionAppName'), '2016-08-01', 'Full').identity.principalId]",
+                      "tenantId": "[reference(variables('functionAppName'), '2016-08-01', 'Full').identity.tenantId]",
+                      "permissions": {
+                        "keys": [],
+                        "secrets": [
+                          "Get"
+                        ]
+                      }
+                  }
+              ]
+          },         
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('functionAppName'))]"
+          ]
       }
     ]
   }
