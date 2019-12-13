@@ -1,0 +1,25 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "variables": {
+        "accountName": "[replace(toLower(resourceGroup().name),'-', '')]",
+        "location": "[resourceGroup().location]",
+        "skuName": "Standard"
+    },
+    "resources":[
+    {
+        "type": "Microsoft.KeyVault/vaults",
+        "name": "[variables('accountName')]",
+        "apiVersion": "2018-02-14",
+        "location": "[variables('location')]",
+        "properties": {
+            "tenantId": "[subscription().tenantId]",
+            "sku": {
+                "name": "[variables('skuName')]",
+                "family": "A"
+            },
+            "accessPolicies":[]
+        }
+    }
+    ]
+}
