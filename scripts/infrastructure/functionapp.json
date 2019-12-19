@@ -7,7 +7,7 @@
       "appServicePlanName": "[variables('sharedServicesName')]",
       "applicationInsightsName": "[variables('sharedServicesName')]",
       "keyVaultName": "[variables('sharedServicesName')]",
-      "functionAppName": "[concat(toLower(resourceGroup().name),'-','realestate')]",
+      "functionAppName": "[concat(toLower(resourceGroup().name),'-','library')]",
       "keyVaultStorageAccountSecretName": "StorageAccountConnectionString",
       "keyVaultCosmosDBSecretName": "AzureCosmosDBConnection"
     },

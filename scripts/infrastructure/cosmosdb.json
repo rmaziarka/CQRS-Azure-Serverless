@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "variables": {
         "accountName": "[replace(toLower(resourceGroup().name),'-', '')]",
-        "databaseName": "RealEstate",
+        "databaseName": "LibraryCorp",
         "location": "[resourceGroup().location]",
         "locations": 
         [ 
@@ -14,7 +14,7 @@
         ],
         "containers":{
             "leaseContainerName": "leases",
-            "estatesContainerName": "estates"
+            "librariesContainerName": "libraries"
         },
         "consistencyLevel":  "Session",
         "throughput": 400
@@ -47,16 +47,16 @@
         },
         {
             "type": "Microsoft.DocumentDb/databaseAccounts/apis/databases/containers",
-            "name": "[concat(variables('accountName'), '/sql/', variables('databaseName'), '/', variables('containers').estatesContainerName)]",
+            "name": "[concat(variables('accountName'), '/sql/', variables('databaseName'), '/', variables('containers').librariesContainerName)]",
             "apiVersion": "2016-03-31",
             "dependsOn": [ "[resourceId('Microsoft.DocumentDB/databaseAccounts/apis/databases', variables('accountName'), 'sql', variables('databaseName'))]" ],
             "properties":
             {
                 "resource":{
-                    "id":  "[variables('containers').estatesContainerName]",
+                    "id":  "[variables('containers').librariesContainerName]",
                     "partitionKey": {
                         "paths": [
-                        "/CompanyId"
+                        "/LibraryId"
                         ],
                         "kind": "Hash"
                     }
