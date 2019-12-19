@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using LibraryCorp;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Description;
@@ -8,11 +8,10 @@ using Microsoft.Azure.WebJobs.Host.Bindings;
 using Microsoft.Azure.WebJobs.Host.Config;
 using Microsoft.Azure.WebJobs.Hosting;
 using Newtonsoft.Json;
-using RealEstate;
 
 // based on: https://www.tpeczek.com/2019/01/azure-functions-20-extensibility.html
 [assembly: WebJobsStartup(typeof(CosmosDBExtensionsWebJobsStartup))]
-namespace RealEstate
+namespace LibraryCorp
 {
     public class CosmosDBExtensionsWebJobsStartup : IWebJobsStartup
     {

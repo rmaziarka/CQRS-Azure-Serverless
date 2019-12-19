@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using Microsoft.Azure.Documents;
 using Newtonsoft.Json;
 
-namespace RealEstate
+namespace LibraryCorp
 {
     public class Estate
     {

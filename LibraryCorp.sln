@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28803.452
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealEstate", "RealEstate\RealEstate.csproj", "{BF14240D-D2FB-43BA-B546-4968986BF043}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibraryCorp", "LibraryCorp\LibraryCorp.csproj", "{BF14240D-D2FB-43BA-B546-4968986BF043}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "REST", "REST", "{9A6AE045-FFA7-4918-952E-6B23B896C029}"
 EndProject

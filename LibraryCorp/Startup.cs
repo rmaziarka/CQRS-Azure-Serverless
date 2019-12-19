@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using LibraryCorp;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters.Json.Internal;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
-using Microsoft.Azure.WebJobs.Description;
-using Microsoft.Azure.WebJobs.Host.Config;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-[assembly: FunctionsStartup(typeof(RealEstate.Startup))]
-namespace RealEstate
+[assembly: FunctionsStartup(typeof(Startup))]
+namespace LibraryCorp
 {
     public class Startup : FunctionsStartup
     {
