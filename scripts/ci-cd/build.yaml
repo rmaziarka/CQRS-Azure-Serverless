@@ -13,6 +13,7 @@ pool:
 
 variables:
     buildConfiguration: 'Release'
+    FunctionHostPath: 'C:\\npm\\prefix\\node_modules\\azure-functions-core-tools\\bin\\func.dll'
 
 steps:
 - script: dotnet restore
@@ -29,6 +30,8 @@ steps:
     keyVaultName: 'cqrsazureserverless'
     secretsFilter: 'AzureCosmosDBConnection,StorageAccountConnectionString'
 
+- script: dotnet test
+
 - task: DotNetCoreCLI@2
   inputs:
     command: publish
@@ -38,12 +41,6 @@ steps:
     modifyOUtputPath: true
   displayName: 'Publish'
 
-#- task: ArchiveFiles@2
-#  displayName: "Zip files"
-#  inputs:
-#    rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output"
-#    includeRootFolder: false
-#    archiveFile: "$(System.DefaultWorkingDirectory)/build$(Build.BuildId).zip"
 - task: PublishBuildArtifacts@1
   inputs:
     pathtoPublish: "$(System.DefaultWorkingDirectory)/publish_output"
