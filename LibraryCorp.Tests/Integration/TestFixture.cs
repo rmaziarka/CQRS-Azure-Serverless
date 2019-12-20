@@ -37,8 +37,8 @@ namespace LibraryCorp.Tests.Integration
             var functionHostPath = Environment.ExpandEnvironmentVariables(config["FunctionHostPath"]);
             var functionAppFolder = Environment.ExpandEnvironmentVariables(config["FunctionApplicationPath"]);
 
-            var configMessage = new DiagnosticMessage("DotnetExePath: {0}, FunctionHostPath: {1}, FunctionApplicationPath: {2}", 
-                dotnetExePath, functionHostPath, functionAppFolder);
+            var configMessage = new DiagnosticMessage("DotnetExePath: {0}, FunctionHostPath: {1}, FunctionApplicationPath: {2}, ProgramFiles: {3}", 
+                dotnetExePath, functionHostPath, functionAppFolder, config["ProgramFiles"]);
 
             sink.OnMessage(configMessage);
 
