@@ -6,6 +6,7 @@ trigger:
         include:
         - LibraryCorp/*
         - LibraryCorp.sln
+        - scripts/ci-cd/*
 
 pool:
     vmImage: 'ubuntu-latest'
@@ -24,7 +25,7 @@ steps:
   inputs:
     command: publish
     arguments: '--configuration $(buildConfiguration) --output publish_output'
-    projects: '**/*.csproj'
+    projects: 'LibraryCorp/LibraryCorp.csproj'
     publishWebProjects: false
     modifyOUtputPath: true
   displayName: 'Publish'
