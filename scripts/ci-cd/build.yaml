@@ -21,6 +21,16 @@ steps:
 - script: dotnet build --configuration $(buildConfiguration)
   displayName: 'Build'
 
+- task: Npm@1
+  inputs:
+    command: 'install -g azure-functions-core-tools'
+
+- task: AzureKeyVault@1
+  inputs:
+    azureSubscription: 'CQRS-Azure-Serverless'
+    keyVaultName: 'cqrsazureserverless'
+    secretsFilter: 'AzureCosmosDBConnection,StorageAccountConnectionString'
+
 - task: DotNetCoreCLI@2
   inputs:
     command: publish
