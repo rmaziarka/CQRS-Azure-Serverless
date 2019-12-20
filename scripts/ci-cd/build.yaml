@@ -10,12 +10,11 @@ trigger:
         - scripts/ci-cd/*
 
 pool:
-    vmImage: 'ubuntu-latest'
+    vmImage: 'windows-latest'
 
 variables:
     buildConfiguration: 'Release'
     FunctionHostPath: 'C:\\npm\\prefix\\node_modules\\azure-functions-core-tools\\bin\\func.dll'
-    DotnetExecutablePath: "/usr/local/share/dotnet"
 
 steps:
 - script: dotnet restore
