@@ -22,6 +22,7 @@ namespace LibraryCorp.Tests.Integration
 
             var config = new ConfigurationBuilder()
                 .AddJsonFile("settings.json")
+                .AddEnvironmentVariables()
                 .Build();
 
             _funcHostProcess = StartFunction(config, sink);
