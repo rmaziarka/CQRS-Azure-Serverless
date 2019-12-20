@@ -16,7 +16,7 @@ namespace LibraryCorp.Tests.Integration
         private readonly TestFixture _fixture;
 
         [Fact]
-        public async Task Normal_Orders_Must_Be_In_Normal_Orders_Container()
+        public async Task AddCopies_creates_book_copies()
         {
             var httpResponse = await _fixture.Client.PostJsonAsync("api/copies", new AddCopies
             {

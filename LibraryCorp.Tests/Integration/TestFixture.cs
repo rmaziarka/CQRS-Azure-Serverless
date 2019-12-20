@@ -4,7 +4,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using Microsoft.Extensions.Configuration;
+using Xunit.Abstractions;
+using Xunit.Sdk;
+
 namespace LibraryCorp.Tests.Integration
 {
     public class TestFixture : IDisposable
@@ -13,20 +17,26 @@ namespace LibraryCorp.Tests.Integration
 
         public readonly HttpClient Client = new HttpClient();
 
-        public TestFixture()
+        public TestFixture(IMessageSink sink)
         {
 
             var config = new ConfigurationBuilder()
                 .AddJsonFile("settings.json")
                 .Build();
 
-            
+            _funcHostProcess = StartFunction(config, sink);
 
+            Client.BaseAddress = new Uri($"http://localhost:{Port}");
+
+        }
+
+        public Process StartFunction(IConfigurationRoot config, IMessageSink sink)
+        {
             var dotnetExePath = Environment.ExpandEnvironmentVariables(config["DotnetExecutablePath"]);
             var functionHostPath = Environment.ExpandEnvironmentVariables(config["FunctionHostPath"]);
             var functionAppFolder = Environment.ExpandEnvironmentVariables(config["FunctionApplicationPath"]);
 
-            _funcHostProcess = new Process
+            var funcHostProcess = new Process
             {
                 StartInfo =
                 {
@@ -34,18 +44,46 @@ namespace LibraryCorp.Tests.Integration
                     Arguments = $"\"{functionHostPath}\" start -p {Port} --csharp",
                     WorkingDirectory = functionAppFolder,
                     RedirectStandardError = true,
+                    RedirectStandardOutput = true,
                 }
             };
-            var success = _funcHostProcess.Start();
+            
+            var success = funcHostProcess.Start();
             if (!success)
             {
                 throw new InvalidOperationException("Could not start Azure Functions host.");
             }
 
-            Client.BaseAddress = new Uri($"http://localhost:{Port}");
+            ConfigureFunctionLogging(sink, funcHostProcess);
+
+            if (funcHostProcess.HasExited)
+            {
+                var error = _funcHostProcess.StandardError.ReadToEnd();
+                throw new InvalidOperationException(error);
+            }
+
+            // ugly hack to let azure function start before test begun
+            Thread.Sleep(200);
+
+            return funcHostProcess;
         }
 
-        public int Port { get; } = 7071;
+        private static void ConfigureFunctionLogging(IMessageSink sink, Process funcHostProcess)
+        {
+            void LogToOutput(object sender, DataReceivedEventArgs args)
+            {
+                var message = new DiagnosticMessage(args.Data);
+                sink.OnMessage(message);
+            }
+
+            funcHostProcess.ErrorDataReceived += LogToOutput;
+            funcHostProcess.OutputDataReceived += LogToOutput;
+
+            funcHostProcess.BeginOutputReadLine();
+            funcHostProcess.BeginErrorReadLine();
+        }
+
+        public int Port => 7071;
 
         public virtual void Dispose()
         {

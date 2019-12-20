@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.779
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibraryCorp", "LibraryCorp\LibraryCorp.csproj", "{BF14240D-D2FB-43BA-B546-4968986BF043}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "REST", "REST", "{9A6AE045-FFA7-4918-952E-6B23B896C029}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibraryCorp.Tests", "LibraryCorp.Tests\LibraryCorp.Tests.csproj", "{88388AF5-C029-4A61-BDBC-C11A121061A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibraryCorp.Tests", "LibraryCorp.Tests\LibraryCorp.Tests.csproj", "{88388AF5-C029-4A61-BDBC-C11A121061A5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
