@@ -23,7 +23,7 @@ steps:
 - script: dotnet build --configuration $(buildConfiguration)
   displayName: 'Build'
 
-- script: 'sudo npm install -g azure-functions-core-tools --unsafe-perm=true --allow-root'
+- script: 'npm install -g azure-functions-core-tools --unsafe-perm=true --allow-root'
   displayName: "NPM install azure functions"
 
 - task: AzureKeyVault@1
