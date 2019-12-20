@@ -23,6 +23,7 @@ steps:
   displayName: 'Build'
 
 - script: 'sudo npm install -g azure-functions-core-tools --unsafe-perm=true --allow-root'
+  displayName: "NPM install azure functions"
 
 - task: AzureKeyVault@1
   inputs:
@@ -31,6 +32,8 @@ steps:
     secretsFilter: 'AzureCosmosDBConnection,StorageAccountConnectionString'
 
 - script: dotnet test
+  workingDirectory: 'LibraryCorp.Tests'
+  displayName: 'Integration tests'
 
 - task: DotNetCoreCLI@2
   inputs:
