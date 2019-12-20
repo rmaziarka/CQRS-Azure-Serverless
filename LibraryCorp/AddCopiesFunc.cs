@@ -16,6 +16,10 @@ namespace LibraryCorp
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
+            var connectionString =
+                Environment.GetEnvironmentVariable("AzureCosmosDBConnection", EnvironmentVariableTarget.Process);
+
+            log.LogInformation("AzureCosmosDBConnection: " + connectionString);
 
             var container = CosmosClientFactory.GetLibrariesContainer();
 
