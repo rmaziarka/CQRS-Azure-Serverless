@@ -1,5 +1,5 @@
 ﻿{
-    "DotnetExecutablePath": "%ProgramFiles%\\dotnet\\dotnet.exe",
-    "FunctionHostPath": "%APPDATA%\\npm\\node_modules\\azure-functions-core-tools\\bin\\func.dll",
-    "FunctionApplicationPath": "..\\..\\..\\..\\LibraryCorp\\bin\\Debug\\netcoreapp2.2"
+  "DotnetExecutablePath": "C:\\Program Files\\dotnet\\dotnet.exe",
+  "FunctionHostPath": "%APPDATA%\\npm\\node_modules\\azure-functions-core-tools\\bin\\func.dll",
+  "FunctionApplicationPath": "..\\..\\..\\..\\LibraryCorp\\bin\\Debug\\netcoreapp2.2"
 }

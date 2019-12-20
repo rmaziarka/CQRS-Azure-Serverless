@@ -33,12 +33,12 @@ namespace LibraryCorp.Tests.Integration
 
         public Process StartFunction(IConfigurationRoot config, IMessageSink sink)
         {
-            var dotnetExePath = Environment.ExpandEnvironmentVariables(config["DotnetExecutablePath"]);
+            var dotnetExePath = config["DotnetExecutablePath"];
             var functionHostPath = Environment.ExpandEnvironmentVariables(config["FunctionHostPath"]);
-            var functionAppFolder = Environment.ExpandEnvironmentVariables(config["FunctionApplicationPath"]);
+            var functionAppFolder = config["FunctionApplicationPath"];
 
             var configMessage = new DiagnosticMessage("DotnetExePath: {0}, FunctionHostPath: {1}, FunctionApplicationPath: {2}, ProgramFiles: {3}", 
-                dotnetExePath, functionHostPath, functionAppFolder, config["ProgramFiles"]);
+                dotnetExePath, functionHostPath, functionAppFolder);
 
             sink.OnMessage(configMessage);
 

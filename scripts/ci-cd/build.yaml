@@ -15,6 +15,7 @@ pool:
 variables:
     buildConfiguration: 'Release'
     FunctionHostPath: 'C:\\npm\\prefix\\node_modules\\azure-functions-core-tools\\bin\\func.dll'
+    "/usr/bin/dotnet/dotnet.exe"
 
 steps:
 - script: dotnet restore
