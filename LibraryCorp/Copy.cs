@@ -16,6 +16,14 @@ namespace LibraryCorp
             IsTaken = false;
         }
 
+        public void Block(){
+            IsTaken = true;
+        }
+
+        public void Release(){
+            IsTaken = false;
+        }
+
         [JsonProperty(PropertyName = "id")]
         public string Id { get; private set; }
 
