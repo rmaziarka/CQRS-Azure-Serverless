@@ -5,12 +5,10 @@ using Newtonsoft.Json;
 
 namespace LibraryCorp
 {
-    public class Copy
+    public class Copy : Aggregate
     {
         public Copy(string libraryId, string brandId, string serialNumber)
         {
-            Id = Guid.NewGuid().ToString();
-            LibraryId = libraryId;
             BrandId = brandId;
             CopyNumber = serialNumber;
             IsTaken = false;
@@ -24,16 +22,10 @@ namespace LibraryCorp
             IsTaken = false;
         }
 
-        [JsonProperty(PropertyName = "id")]
-        public string Id { get; private set; }
-
-        public string LibraryId { get; private set; }
+        public string BrandId { get; private set; }
 
         public string CopyNumber { get; private set; }
 
-        public string BrandId { get; private set; }
-
         public bool IsTaken { get; private set; }
-
     }
 }

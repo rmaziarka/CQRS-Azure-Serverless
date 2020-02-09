@@ -3,14 +3,14 @@ using System.Collections.Generic;
 
 namespace LibraryCorp
 {
-    public class Reservation
+    public class Reservation: Aggregate
     {
         public Reservation(string readerId, string copyId)
         {
             ReaderId = readerId;
             CopyId = copyId;
             ReservationDate = DateTime.Now;
-            ReleaseDate = ReservationDate.AddDay(1);
+            ReleaseDate = ReservationDate.AddDays(1);
         }
 
         public string ReaderId { get; private set; }

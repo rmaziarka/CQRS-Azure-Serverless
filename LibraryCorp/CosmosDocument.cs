@@ -1,25 +1,28 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.Azure.Documents;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace LibraryCorp
 {
-    public class CosmosDocument<T>: Docuemt
+    public class CosmosDocument<T>: Document where T: Aggregate
     {
-      public CosmosDocument(T data)
+        public CosmosDocument(string partitionKey, T data)
         {
+            this.PartitionKey = partitionKey;
             this.Data = data;
         }
-
-        public const char Separator = '~';
-
-
+        
         [JsonProperty(PropertyName = "id")]
-        public virtual string Id => this.Data.Id;
+        public string Id => this.Data.Id;
+
+        public string PartitionKey { get; private set; }
+
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public DocumentType DocumentType => typeof(T).Name; 
+        public string DocumentType => typeof(T).Name; 
 
         public T Data { get; }
 

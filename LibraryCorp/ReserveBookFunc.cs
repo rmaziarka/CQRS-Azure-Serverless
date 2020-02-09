@@ -8,24 +8,22 @@ using Microsoft.Extensions.Logging;
 
 namespace LibraryCorp
 {
-    public static class AddCopiesFunc
+    public static class ReserveBookFunc
     {
-        [FunctionName("AddCopies")]
+        [FunctionName("ReserveBook")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "reserveBook")] ReserveBook command,
             ILogger log)
         {
-            var container = CosmosClientFactory.GetLibrariesContainer();
+            var repo = new CosmosRepo(command.LibraryId);
+            repo.StartTransaction();
 
-            var copyToReserve = container.GetFreeCopy(command.BrandId);
-            
-            var batch = container.CreateTransactionalBatch(new PartitionKey(command.LibraryId));
+            var copyToReserve = await repo.GetFreeCopy(command.BrandId);
             copyToReserve.Block();
-            batch.UpdateItem(copyToReserve); // etag check
-
+            
             var reservation = new Reservation(copyToReserve.Id, command.ReaderId);
-            batch.CreateItem(reservation);
-            await batch.ExecuteAsync();
+            repo.Create(reservation);
+            await repo.ExecuteAsync();
 
             return (ActionResult) new OkObjectResult($"Hello, {command.LibraryId}");
         }
