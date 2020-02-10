@@ -5,44 +5,100 @@ using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
 namespace LibraryCorp.Tests.Integration
 {
-    public class TestFixture : IAsyncLifetime
+    public class TestFixture : IDisposable
     {
+        private readonly Process _funcHostProcess;
+
         public readonly HttpClient Client = new HttpClient();
-        private IHost _host;
-        private int _port => 7071;
 
-
-        public async Task InitializeAsync()
+        public TestFixture(IMessageSink sink)
         {
+
             var config = new ConfigurationBuilder()
                 .AddJsonFile("settings.json")
                 .AddEnvironmentVariables()
                 .Build();
 
-            _host = new HostBuilder()
-                .ConfigureWebJobs(builder => builder
-                    .UseWebJobsStartup<Startup>())
-                .Build();
+            _funcHostProcess = StartFunction(config, sink);
 
-            await _host.StartAsync();
-
-            Client.BaseAddress = new Uri($"http://localhost:{_port}");
+            Client.BaseAddress = new Uri($"http://localhost:{Port}");
 
         }
 
-        public async Task DisposeAsync()
+        public Process StartFunction(IConfigurationRoot config, IMessageSink sink)
         {
-            await _host.StopAsync();
+            var dotnetExePath = Environment.ExpandEnvironmentVariables(config["DotnetExecutablePath"]);
+            var functionHostPath = Environment.ExpandEnvironmentVariables(config["FunctionHostPath"]);
+            var functionAppFolder = config["FunctionApplicationPath"];
+
+            var configMessage = new DiagnosticMessage("DotnetExePath: {0}, FunctionHostPath: {1}, FunctionApplicationPath: {2}", 
+                dotnetExePath, functionHostPath, functionAppFolder);
+
+            sink.OnMessage(configMessage);
+
+            var funcHostProcess = new Process
+            {
+                StartInfo =
+                {
+                    FileName = dotnetExePath,
+                    Arguments = $"\"{functionHostPath}\" start -p {Port} --csharp",
+                    WorkingDirectory = functionAppFolder,
+                    RedirectStandardError = true,
+                    RedirectStandardOutput = true,
+                }
+            };
+            
+            var success = funcHostProcess.Start();
+            if (!success)
+            {
+                throw new InvalidOperationException("Could not start Azure Functions host.");
+            }
+
+            ConfigureFunctionLogging(sink, funcHostProcess);
+
+            if (funcHostProcess.HasExited)
+            {
+                var error = _funcHostProcess.StandardError.ReadToEnd();
+                throw new InvalidOperationException(error);
+            }
+
+            // ugly hack to let azure function start before test begun
+            Thread.Sleep(200);
+
+            return funcHostProcess;
+        }
+
+        private static void ConfigureFunctionLogging(IMessageSink sink, Process funcHostProcess)
+        {
+            void LogToOutput(object sender, DataReceivedEventArgs args)
+            {
+                var message = new DiagnosticMessage(args.Data);
+                sink.OnMessage(message);
+            }
+
+            funcHostProcess.ErrorDataReceived += LogToOutput;
+            funcHostProcess.OutputDataReceived += LogToOutput;
+
+            funcHostProcess.BeginOutputReadLine();
+            funcHostProcess.BeginErrorReadLine();
+        }
+
+        public int Port => 7071;
+
+        public virtual void Dispose()
+        {
+            if (!_funcHostProcess.HasExited)
+            {
+                _funcHostProcess.Kill();
+            }
+
+            _funcHostProcess.Dispose();
         }
     }
 }
