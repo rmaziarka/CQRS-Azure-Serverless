@@ -20,8 +20,8 @@ namespace LibraryCorp.Tests.Integration
         {
             var httpResponse = await _fixture.Client.PostJsonAsync("api/copies", new AddCopies
             {
-                LibraryId = Guid.Parse("2e4abb3e-fce5-40be-bce5-e6ca7a66aabe").ToString(),
-                BrandId = Guid.Parse("72595fb4-dd7a-4bfe-8ee9-1f5125feb07f").ToString(),
+                LibraryId = Guid.Parse("a5b30ee9-e229-49d8-aab8-ba4463e2fe14").ToString(),
+                BrandId = Guid.Parse("9f5da8f5-24da-40d4-93f6-9ca980ff9b54").ToString(),
                 CopyNumbers = new List<string>(){ "123-123-123", "456-456-456", "789-789-789" }
             });
 
