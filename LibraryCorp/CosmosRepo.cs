@@ -76,8 +76,12 @@ namespace LibraryCorp
                 this._batch.ReplaceItem(modifiedDocument.Id, modifiedDocument);
             }
 
-           var response =  await this._batch.ExecuteAsync();
-           return response;
+            var response =  await this._batch.ExecuteAsync();
+
+            if (!response.IsSuccessStatusCode)
+                throw new InvalidOperationException(response.ErrorMessage);
+
+            return response;
         }
     }
 }
