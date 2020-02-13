@@ -15,17 +15,27 @@ namespace LibraryCorp
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "reserveBook")] ReserveBook command,
             ILogger log)
         {
-            var repo = new CosmosRepo(command.LibraryId);
-            repo.StartTransaction();
+            try
+            {
+                var repo = new CosmosRepo(command.LibraryId);
+                repo.StartTransaction();
 
-            var copyToReserve = await repo.GetFreeCopy(command.BrandId);
-            copyToReserve.Block();
-            
-            var reservation = new Reservation(copyToReserve.Id, command.ReaderId);
-            repo.Create(reservation);
-            await repo.ExecuteAsync();
+                var copyToReserve = await repo.GetFreeCopy(command.BrandId);
+                copyToReserve.Block();
+                
+                var reservation = new Reservation(command.ReaderId, copyToReserve.Id);
+                repo.Create(reservation);
+                await repo.ExecuteAsync();
 
-            return (ActionResult) new OkObjectResult($"Hello, {command.LibraryId}");
+                return (ActionResult) new OkObjectResult($"Hello, {command.LibraryId}");
+
+            }
+            catch (Exception e)
+            {
+                log.LogError(e, e.StackTrace);
+
+                throw;
+            }
         }
     }
 }

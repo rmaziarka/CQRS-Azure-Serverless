@@ -14,6 +14,11 @@ namespace LibraryCorp
             IsTaken = false;
         }
 
+        private Copy()
+        {
+            
+        }
+
         public void Block(){
             IsTaken = true;
         }
