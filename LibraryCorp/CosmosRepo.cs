@@ -39,15 +39,17 @@ namespace LibraryCorp
             _batch.CreateItem(cosmosDocument);
         }
 
-        public async Task<IEnumerable<CosmosDocument<T>>> GetDocuments<T>(Expression<Func<CosmosDocument<T>, bool>> query) where T : Aggregate
+
+        public async Task<Copy> GetFreeCopy(string brandId)
         {
-            var where = _container.GetItemLinqQueryable<CosmosDocument<T>>()
+            var where = _container.GetItemLinqQueryable<CosmosDocument<Copy>>()
                 .Where(x => x.PartitionKey == this._partitionKey)
-                .Where(query);
+                .Where(x => x.Data.BrandId == brandId && !x.Data.IsTaken)
+                .Take(1);
 
             var iterator = where.ToFeedIterator();
 
-            var list = new List<CosmosDocument<T>>();
+            var list = new List<CosmosDocument<Copy>>();
             while (iterator.HasMoreResults)
             {
                 foreach (var document in await iterator.ReadNextAsync())
@@ -56,17 +58,8 @@ namespace LibraryCorp
                     _modifiedDocuments.Add(document);
                 }
             }
-
-            return list;
-        }
-
-        public async Task<Copy> GetFreeCopy(string brandId)
-        {
-            var documents = await this.GetDocuments<Copy>(x =>
-                x.Data.BrandId == brandId
-                && !x.Data.IsTaken);
-
-            return documents.FirstOrDefault()?.Data;
+            
+            return list.FirstOrDefault()?.Data;
         }
 
         public async Task<TransactionalBatchResponse> ExecuteAsync()

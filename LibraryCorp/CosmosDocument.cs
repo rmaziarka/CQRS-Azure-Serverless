@@ -38,9 +38,6 @@ namespace LibraryCorp
         [JsonProperty(PropertyName = "data")]
         public T Data { get; }
 
-        [JsonProperty(PropertyName = "_etag")]
-        public string ETag { get; }
-
         [OnSerializing]
         internal void OnSerializingMethod(StreamingContext context)
         {
