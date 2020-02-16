@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace LibraryCorp
+namespace LibraryCorp.Funcs.AddCopies
 {
     public class AddCopies
     {

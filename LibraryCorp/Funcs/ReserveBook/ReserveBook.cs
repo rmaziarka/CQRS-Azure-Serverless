@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 
-namespace LibraryCorp
+namespace LibraryCorp.Funcs.ReserveBook
 {
     public class ReserveBook
     {

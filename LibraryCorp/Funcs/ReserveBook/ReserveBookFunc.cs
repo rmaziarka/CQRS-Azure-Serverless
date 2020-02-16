@@ -1,18 +1,18 @@
 using System;
 using System.Threading.Tasks;
+using LibraryCorp.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 
-namespace LibraryCorp
+namespace LibraryCorp.Funcs.ReserveBook
 {
-    public static class BorrowBookFunc
+    public static class ReturnBookFunc
     {
-        [FunctionName("BorrowBook")]
+        [FunctionName("ReserveBook")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "borrowBook")] BorrowBook command,
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "reserveBook")] ReserveBook command,
             ILogger log)
         {
             try
@@ -20,14 +20,14 @@ namespace LibraryCorp
                 var repo = new CosmosRepo(command.LibraryId);
                 repo.StartTransaction();
 
-                var reservation = await repo.GetReservation(command.ReaderId, command.ReservationId);
-                reservation.Borrow();
+                var copyToReserve = await repo.GetFreeCopy(command.BrandId);
+                copyToReserve.Block();
                 
-                var borrow = new Borrow(command.ReaderId, reservation.CopyId);
-                repo.Create(borrow);
+                var reservation = new Reservation(command.ReaderId, copyToReserve.Id);
+                repo.Create(reservation);
                 await repo.ExecuteAsync();
 
-                return new OkObjectResult(new { borrowId = borrow.Id});
+                return new OkObjectResult(new { reservationId = reservation.Id });
 
             }
             catch (Exception e)

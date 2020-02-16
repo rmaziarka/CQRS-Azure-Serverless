@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using LibraryCorp.Funcs.AddCopies;
 using Xunit;
 
 namespace LibraryCorp.Tests.Integration

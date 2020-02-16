@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace LibraryCorp
+namespace LibraryCorp.Models
 {
     public class Borrow: Aggregate
     {
