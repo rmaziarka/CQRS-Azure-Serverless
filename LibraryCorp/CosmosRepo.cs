@@ -62,6 +62,28 @@ namespace LibraryCorp
             return list.FirstOrDefault()?.Data;
         }
 
+        public async Task<Reservation> GetReservation(string readerId, string reservationId)
+        {
+            var where = _container.GetItemLinqQueryable<CosmosDocument<Reservation>>()
+                .Where(x => x.PartitionKey == this._partitionKey)
+                .Where(x => x.Data.ReaderId == readerId && x.Data.Id == reservationId)
+                .Take(1);
+
+            var iterator = where.ToFeedIterator();
+
+            var list = new List<CosmosDocument<Reservation>>();
+            while (iterator.HasMoreResults)
+            {
+                foreach (var document in await iterator.ReadNextAsync())
+                {
+                    list.Add(document);
+                    _modifiedDocuments.Add(document);
+                }
+            }
+
+            return list.FirstOrDefault()?.Data;
+        }
+
         public async Task<TransactionalBatchResponse> ExecuteAsync()
         {
             foreach (var modifiedDocument in _modifiedDocuments)

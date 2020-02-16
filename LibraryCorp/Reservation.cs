@@ -11,6 +11,15 @@ namespace LibraryCorp
             CopyId = copyId;
             ReservationDate = DateTime.Now;
             ReleaseDate = ReservationDate.AddDays(1);
+            Status = ReservationStatus.Pending;
+        }
+
+        public void Borrow()
+        {
+            if (Status != ReservationStatus.Pending)
+                throw new InvalidOperationException("You cannot take book - it's expired or already taken.");
+
+            Status = ReservationStatus.Borrowed;
         }
 
         public string ReaderId { get; private set; }
@@ -20,5 +29,12 @@ namespace LibraryCorp
         public DateTime ReservationDate { get; private set; }
 
         public DateTime ReleaseDate { get; private set; }
+
+        public ReservationStatus Status { get; private set; }
+    }
+
+    public enum ReservationStatus
+    {
+        Pending, Borrowed, Expired
     }
 }

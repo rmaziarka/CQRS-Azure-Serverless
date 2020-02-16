@@ -6,6 +6,7 @@ using System.Text;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Cosmos.Fluent;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 
 namespace LibraryCorp
@@ -25,7 +26,7 @@ namespace LibraryCorp
                 NullValueHandling = NullValueHandling.Ignore,
                 Formatting = Formatting.Indented,
                 ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor,
-                Converters = new List<JsonConverter>() { new CosmosDocumentConverter()},
+                Converters = new List<JsonConverter>() { new CosmosDocumentConverter(), new StringEnumConverter()},
                 ContractResolver = new PrivateResolver()
             };
 
