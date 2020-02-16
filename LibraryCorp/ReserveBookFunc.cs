@@ -27,7 +27,7 @@ namespace LibraryCorp
                 repo.Create(reservation);
                 await repo.ExecuteAsync();
 
-                return (ActionResult) new OkObjectResult($"Hello, {command.LibraryId}");
+                return new OkObjectResult(new { reservationId = reservation.Id });
 
             }
             catch (Exception e)
