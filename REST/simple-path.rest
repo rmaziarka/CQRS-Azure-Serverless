@@ -1,0 +1,33 @@
+POST http://localhost:7071/api/copies
+Content-Type: application/json
+
+{
+    "libraryId": "a5b30ee9-e229-49d8-aab8-ba4463e2fe14",
+    "brandId": "9f5da8f5-24da-40d4-93f6-9ca980ff9b54",
+    "copyNumbers": [
+        "123-123-123",
+        "456-456-456",
+        "789-789-789"
+    ]
+}
+
+# @name reservation
+POST http://localhost:7071/api/reserveBook
+Content-Type: application/json
+
+{
+    "libraryId": "a5b30ee9-e229-49d8-aab8-ba4463e2fe14",
+    "brandId": "9f5da8f5-24da-40d4-93f6-9ca980ff9b54",
+    "readerId": "9638c3ed-4d8b-4c04-b1e5-2d7276886280"
+}
+
+@reservationId = {{reservation.response.body.reservationId}}
+
+POST http://localhost:7071/api/borrowBook
+Content-Type: application/json
+
+{
+    "libraryId": "a5b30ee9-e229-49d8-aab8-ba4463e2fe14",
+    "reservationId": "{{reservationId}}",
+    "readerId": "9638c3ed-4d8b-4c04-b1e5-2d7276886280"
+}
