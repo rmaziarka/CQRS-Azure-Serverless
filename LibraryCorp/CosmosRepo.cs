@@ -18,7 +18,7 @@ namespace LibraryCorp
     {
         private readonly Container _container;
         private TransactionalBatch _batch;
-        private List<Document> _modifiedDocuments;
+        private List<ICosmosDocument> _modifiedDocuments;
         private CosmosClient _client;
         private string _partitionKey;
 
@@ -26,7 +26,7 @@ namespace LibraryCorp
         {
             this._partitionKey = partitionKey;
             this._container = CosmosClientFactory.GetLibrariesContainer();
-            this._modifiedDocuments = new List<Document>();
+            this._modifiedDocuments = new List<ICosmosDocument>();
         }
 
         public void StartTransaction()
@@ -43,47 +43,54 @@ namespace LibraryCorp
 
         public async Task<Copy> GetFreeCopy(string brandId)
         {
-            var where = _container.GetItemLinqQueryable<CosmosDocument<Copy>>()
+            var iterator = _container.GetItemLinqQueryable<CosmosDocument<Copy>>()
                 .Where(x => x.PartitionKey == this._partitionKey)
                 .Where(x => x.Data.BrandId == brandId && !x.Data.IsTaken)
-                .Take(1);
+                .Take(1)
+                .ToFeedIterator();
 
-            var iterator = where.ToFeedIterator();
+            var copyDocument = await iterator.GetFirst();
+            _modifiedDocuments.Add(copyDocument);
 
-            var list = new List<CosmosDocument<Copy>>();
-            while (iterator.HasMoreResults)
-            {
-                foreach (var document in await iterator.ReadNextAsync())
-                {
-                    list.Add(document);
-                    _modifiedDocuments.Add(document);
-                }
-            }
-            
-            return list.FirstOrDefault()?.Data;
+            return copyDocument.Data;
         }
 
-        public async Task<Reservation> GetReservation(string readerId, string reservationId)
+        public async Task<(Reservation, Copy)> GetReservationToBorrow(string readerId, string reservationId)
         {
-            var where = _container.GetItemLinqQueryable<CosmosDocument<Reservation>>()
+            var reservation = await GetReservation(reservationId, readerId);
+            var copy = await GetCopy(reservation.CopyId, reservationId);
+
+            return (reservation, copy);
+        }
+
+        public async Task<Reservation> GetReservation(string reservationId, string readerId)
+        {
+            var iterator = _container.GetItemLinqQueryable<CosmosDocument<Reservation>>()
                 .Where(x => x.PartitionKey == this._partitionKey)
                 .Where(x => x.Data.ReaderId == readerId && x.Data.Id == reservationId)
-                .Take(1);
+                .Take(1)
+                .ToFeedIterator();
 
-            var iterator = where.ToFeedIterator();
+            var reservationDocument = await iterator.GetFirst();
+            _modifiedDocuments.Add(reservationDocument);
 
-            var list = new List<CosmosDocument<Reservation>>();
-            while (iterator.HasMoreResults)
-            {
-                foreach (var document in await iterator.ReadNextAsync())
-                {
-                    list.Add(document);
-                    _modifiedDocuments.Add(document);
-                }
-            }
-
-            return list.FirstOrDefault()?.Data;
+            return reservationDocument.Data;
         }
+
+        private async Task<Copy> GetCopy(string copyId, string reservationId)
+        {
+            var iterator = _container.GetItemLinqQueryable<CosmosDocument<Copy>>()
+                .Where(x => x.PartitionKey == this._partitionKey)
+                .Where(x => x.Data.Id == copyId && x.Data.OwnerId == reservationId)
+                .Take(1)
+                .ToFeedIterator();
+
+            var copyDocument = await iterator.GetFirst();
+            _modifiedDocuments.Add(copyDocument);
+
+            return copyDocument.Data;
+        }
+
 
         public async Task<TransactionalBatchResponse> ExecuteAsync()
         {
@@ -98,6 +105,22 @@ namespace LibraryCorp
                 throw new InvalidOperationException(response.ErrorMessage);
 
             return response;
+        }
+    }
+
+    public static class FeedIteratorExtensions
+    {
+        public static async Task<T> GetFirst<T>(this FeedIterator<T> iterator)
+        {
+            while (iterator.HasMoreResults)
+            {
+                foreach (var document in await iterator.ReadNextAsync())
+                {
+                    return document;
+                }
+            }
+
+            return default;
         }
     }
 }

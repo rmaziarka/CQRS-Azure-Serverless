@@ -20,10 +20,11 @@ namespace LibraryCorp.Funcs.BorrowBook
                 var repo = new CosmosRepo(command.LibraryId);
                 repo.StartTransaction();
 
-                var reservation = await repo.GetReservation(command.ReaderId, command.ReservationId);
+                var (reservation, copy) = await repo.GetReservationToBorrow(command.ReaderId, command.ReservationId);
                 reservation.Borrow();
-                
                 var borrow = new Borrow(command.ReaderId, reservation.CopyId);
+                copy.ChangeOwner(borrow.Id);
+
                 repo.Create(borrow);
                 await repo.ExecuteAsync();
 

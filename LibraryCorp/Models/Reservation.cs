@@ -13,6 +13,11 @@ namespace LibraryCorp.Models
             Status = ReservationStatus.Pending;
         }
 
+        private Reservation()
+        {
+
+        }
+
         public void Borrow()
         {
             if (Status != ReservationStatus.Pending)

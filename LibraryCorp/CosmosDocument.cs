@@ -10,7 +10,7 @@ using Newtonsoft.Json.Linq;
 
 namespace LibraryCorp
 {
-    public sealed class CosmosDocument<T>: Document where T: Aggregate
+    public sealed class CosmosDocument<T> :ICosmosDocument where T: Aggregate
     {
         public CosmosDocument(string partitionKey, T data)
         {
@@ -18,13 +18,7 @@ namespace LibraryCorp
             this.Data = data;
         }
 
-        public CosmosDocument(JsonReader reader, JsonSerializerSettings settings)
-        {
-            this.LoadFrom(reader, settings);
-
-            this.PartitionKey = this.GetPropertyValue<string>("partitionKey");
-            this.Data = this.GetPropertyValue<T>("data");
-        }
+        private CosmosDocument(){ }
 
         [JsonProperty(PropertyName = "id")]
         public string Id => this.Data.Id;
@@ -37,13 +31,14 @@ namespace LibraryCorp
         public string DocumentType => typeof(T).Name;
 
         [JsonProperty(PropertyName = "data")]
-        public T Data { get; }
+        public T Data { get; private set; }
 
-        [OnSerializing]
-        internal void OnSerializingMethod(StreamingContext context)
-        {
-            this.SetPropertyValue("data", this.Data);
-        }
+        [JsonProperty(PropertyName = "_etag")]
+        public string ETag { get; private set; }
+    }
 
+    public interface ICosmosDocument
+    {
+        string Id { get; }
     }
 }
