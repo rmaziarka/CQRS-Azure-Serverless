@@ -21,7 +21,7 @@ namespace LibraryCorp.Funcs.ReturnBook
                 repo.StartTransaction();
 
                 var copyToReserve = await repo.GetFreeCopy(command.BrandId);
-                copyToReserve.Block();
+                //copyToReserve.Block();
                 
                 var reservation = new Reservation(command.ReaderId, copyToReserve.Id);
                 repo.Create(reservation);
