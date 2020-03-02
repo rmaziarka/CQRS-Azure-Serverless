@@ -20,9 +20,9 @@ namespace LibraryCorp
         private TransactionalBatch _batch;
         private List<ICosmosDocument> _modifiedDocuments;
         private CosmosClient _client;
-        private string _partitionKey;
+        private Guid _partitionKey;
 
-        public CosmosRepo(string partitionKey)
+        public CosmosRepo(Guid partitionKey)
         {
             this._partitionKey = partitionKey;
             this._container = CosmosClientFactory.GetLibrariesContainer();
@@ -31,17 +31,17 @@ namespace LibraryCorp
 
         public void StartTransaction()
         {
-            this._batch = _container.CreateTransactionalBatch(new PartitionKey(this._partitionKey));
+            this._batch = _container.CreateTransactionalBatch(new PartitionKey(this._partitionKey.ToString()));
         }
 
-        public void Create<T>(T document) where T: Aggregate
+        public void Create<T>(T document) where T: IAggregate
         {
             var cosmosDocument = new CosmosDocument<T>(this._partitionKey, document);
             _batch.CreateItem(cosmosDocument);
         }
 
 
-        public async Task<Copy> GetFreeCopy(string brandId)
+        public async Task<Copy> GetFreeCopy(BrandId brandId)
         {
             var iterator = _container.GetItemLinqQueryable<CosmosDocument<Copy>>()
                 .Where(x => x.PartitionKey == this._partitionKey)
@@ -55,7 +55,7 @@ namespace LibraryCorp
             return copyDocument.Data;
         }
 
-        public async Task<(Reservation, Copy)> GetReservationToBorrow(string readerId, string reservationId)
+        public async Task<(Reservation, Copy)> GetReservationToBorrow(ReaderId readerId, ReservationId reservationId)
         {
             var reservation = await GetReservation(reservationId, readerId);
             var copy = await GetCopy(reservation.CopyId, reservationId);
@@ -63,11 +63,11 @@ namespace LibraryCorp
             return (reservation, copy);
         }
 
-        public async Task<Reservation> GetReservation(string reservationId, string readerId)
+        public async Task<Reservation> GetReservation(ReservationId reservationId, ReaderId readerId)
         {
             var iterator = _container.GetItemLinqQueryable<CosmosDocument<Reservation>>()
                 .Where(x => x.PartitionKey == this._partitionKey)
-                .Where(x => x.Data.ReaderId == readerId && x.Data.Id == reservationId)
+                .Where(x => x.Data.ReaderId == readerId && x.Data.ReservationId == reservationId)
                 .Take(1)
                 .ToFeedIterator();
 
@@ -77,11 +77,11 @@ namespace LibraryCorp
             return reservationDocument.Data;
         }
 
-        private async Task<Copy> GetCopy(string copyId, string reservationId)
+        private async Task<Copy> GetCopy(CopyId copyId, ReservationId reservationId)
         {
             var iterator = _container.GetItemLinqQueryable<CosmosDocument<Copy>>()
                 .Where(x => x.PartitionKey == this._partitionKey)
-                .Where(x => x.Data.Id == copyId && x.Data.OwnerId == reservationId)
+                .Where(x => x.Data.CopyId == copyId && x.Data.OwnerId == reservationId)
                 .Take(1)
                 .ToFeedIterator();
 

@@ -22,7 +22,7 @@ namespace LibraryCorp.Funcs.AddCopies
                 
                 foreach (var copyNumber in command.CopyNumbers)
                 {
-                    var copy = new Copy(command.LibraryId, command.BrandId, copyNumber);
+                    var copy = new Copy(new BrandId(command.BrandId), copyNumber);
                     repo.Create(copy);
                 }
 

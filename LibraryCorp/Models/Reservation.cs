@@ -2,10 +2,11 @@
 
 namespace LibraryCorp.Models
 {
-    public class Reservation: Aggregate
+    public class Reservation: IAggregate
     {
-        public Reservation(string readerId, string copyId)
+        public Reservation(ReaderId readerId, CopyId copyId)
         {
+            ReservationId = new ReservationId(Guid.NewGuid());
             ReaderId = readerId;
             CopyId = copyId;
             ReservationDate = DateTime.Now;
@@ -28,9 +29,11 @@ namespace LibraryCorp.Models
             return new Borrow(this.ReaderId, this.CopyId);
         }
 
-        public string ReaderId { get; private set; }
+        public ReservationId ReservationId { get; private set; }
 
-        public string CopyId { get; private set; }
+        public ReaderId ReaderId { get; private set; }
+
+        public CopyId CopyId { get; private set; }
 
         public DateTime ReservationDate { get; private set; }
 

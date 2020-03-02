@@ -10,32 +10,32 @@ namespace LibraryCorp.Funcs.ReturnBook
 {
     public static class ReturnBookFunc
     {
-        [FunctionName("ReturnBook")]
-        public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "returnBook")] ReserveBook.ReserveBook command,
-            ILogger log)
-        {
-            try
-            {
-                var repo = new CosmosRepo(command.LibraryId);
-                repo.StartTransaction();
+        //[FunctionName("ReturnBook")]
+        //public static async Task<IActionResult> Run(
+        //    [HttpTrigger(AuthorizationLevel.Function, "post", Route = "returnBook")] ReserveBook.ReserveBook command,
+        //    ILogger log)
+        //{
+        //    try
+        //    {
+        //        var repo = new CosmosRepo(command.LibraryId);
+        //        repo.StartTransaction();
 
-                var copyToReserve = await repo.GetFreeCopy(command.BrandId);
-                //copyToReserve.Block();
+        //        var copyToReserve = await repo.GetFreeCopy(new BrandId(command.BrandId));
+        //        //copyToReserve.Block();
                 
-                var reservation = new Reservation(command.ReaderId, copyToReserve.Id);
-                repo.Create(reservation);
-                await repo.ExecuteAsync();
+        //        var reservation = new Reservation(command.ReaderId, copyToReserve.Id);
+        //        repo.Create(reservation);
+        //        await repo.ExecuteAsync();
 
-                return new OkObjectResult(new { reservationId = reservation.Id });
+        //        return new OkObjectResult(new { reservationId = reservation.Id });
 
-            }
-            catch (Exception e)
-            {
-                log.LogError(e, e.StackTrace);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        log.LogError(e, e.StackTrace);
 
-                throw;
-            }
-        }
+        //        throw;
+        //    }
+        //}
     }
 }

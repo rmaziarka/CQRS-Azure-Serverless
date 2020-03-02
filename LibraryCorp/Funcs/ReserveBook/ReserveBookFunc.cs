@@ -20,14 +20,14 @@ namespace LibraryCorp.Funcs.ReserveBook
                 var repo = new CosmosRepo(command.LibraryId);
                 repo.StartTransaction();
 
-                var copyToReserve = await repo.GetFreeCopy(command.BrandId);
-                var reservation = new Reservation(command.ReaderId, copyToReserve.Id);
-                copyToReserve.Block(reservation.Id);
+                var copyToReserve = await repo.GetFreeCopy(new BrandId(command.BrandId));
+                var reservation = new Reservation(new ReaderId(command.ReaderId), copyToReserve.CopyId);
+                copyToReserve.Block(new OwnerId(reservation.ReservationId));
              
                 repo.Create(reservation);
                 await repo.ExecuteAsync();
 
-                return new OkObjectResult(new { reservationId = reservation.Id });
+                return new OkObjectResult(new { reservationId = reservation.ReservationId });
 
             }
             catch (Exception e)

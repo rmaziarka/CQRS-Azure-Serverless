@@ -1,9 +1,12 @@
-﻿namespace LibraryCorp.Models
+﻿using System;
+
+namespace LibraryCorp.Models
 {
-    public class Copy : Aggregate
+    public class Copy : IAggregate
     {
-        public Copy(string libraryId, string brandId, string serialNumber)
+        public Copy(BrandId brandId, string serialNumber)
         {
+            CopyId = new CopyId(Guid.NewGuid());
             BrandId = brandId;
             CopyNumber = serialNumber;
             IsTaken = false;
@@ -14,12 +17,12 @@
             
         }
 
-        public void Block(string ownerId){
+        public void Block(OwnerId ownerId){
             IsTaken = true;
             OwnerId = ownerId;
         }
 
-        public void ChangeOwner(string newOwnerId)
+        public void ChangeOwner(OwnerId newOwnerId)
         {
             OwnerId = newOwnerId;
         }
@@ -29,12 +32,14 @@
             OwnerId = null;
         }
 
-        public string BrandId { get; private set; }
+        public CopyId CopyId { get; private set; }
+
+        public BrandId BrandId { get; private set; }
 
         public string CopyNumber { get; private set; }
 
         public bool IsTaken { get; private set; }
 
-        public string OwnerId { get; private set; }
+        public OwnerId OwnerId { get; private set; }
     }
 }

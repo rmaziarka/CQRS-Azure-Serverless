@@ -20,14 +20,16 @@ namespace LibraryCorp.Funcs.BorrowBook
                 var repo = new CosmosRepo(command.LibraryId);
                 repo.StartTransaction();
 
-                var (reservation, copy) = await repo.GetReservationToBorrow(command.ReaderId, command.ReservationId);
+                var (reservation, copy) = await repo.GetReservationToBorrow(
+                    new ReaderId(command.ReaderId), 
+                    new ReservationId(command.ReservationId));
                 var borrow = reservation.Borrow();
-                copy.ChangeOwner(borrow.Id);
+                copy.ChangeOwner(new OwnerId(borrow.BorrowId));
 
                 repo.Create(borrow);
                 await repo.ExecuteAsync();
 
-                return new OkObjectResult(new { borrowId = borrow.Id});
+                return new OkObjectResult(new { borrowId = borrow.BorrowId });
 
             }
             catch (Exception e)

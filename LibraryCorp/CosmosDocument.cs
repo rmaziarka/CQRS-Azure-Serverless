@@ -10,21 +10,22 @@ using Newtonsoft.Json.Linq;
 
 namespace LibraryCorp
 {
-    public sealed class CosmosDocument<T> :ICosmosDocument where T: Aggregate
+    public sealed class CosmosDocument<T> :ICosmosDocument where T: IAggregate
     {
-        public CosmosDocument(string partitionKey, T data)
+        public CosmosDocument(Guid partitionKey, T data)
         {
             this.PartitionKey = partitionKey;
             this.Data = data;
+            this.Id = Guid.NewGuid().ToString();
         }
 
         private CosmosDocument(){ }
 
         [JsonProperty(PropertyName = "id")]
-        public string Id => this.Data.Id;
+        public string Id { get; private set; }
 
         [JsonProperty(PropertyName = "partitionKey")]
-        public string PartitionKey { get; private set; }
+        public Guid PartitionKey { get; private set; }
 
 
         [JsonProperty(PropertyName = "documentType")]
