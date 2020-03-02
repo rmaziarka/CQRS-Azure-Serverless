@@ -21,8 +21,7 @@ namespace LibraryCorp.Funcs.BorrowBook
                 repo.StartTransaction();
 
                 var (reservation, copy) = await repo.GetReservationToBorrow(command.ReaderId, command.ReservationId);
-                reservation.Borrow();
-                var borrow = new Borrow(command.ReaderId, reservation.CopyId);
+                var borrow = reservation.Borrow();
                 copy.ChangeOwner(borrow.Id);
 
                 repo.Create(borrow);

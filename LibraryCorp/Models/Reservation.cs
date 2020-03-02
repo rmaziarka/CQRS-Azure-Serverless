@@ -18,12 +18,14 @@ namespace LibraryCorp.Models
 
         }
 
-        public void Borrow()
+        public Borrow Borrow()
         {
             if (Status != ReservationStatus.Pending)
                 throw new InvalidOperationException("You cannot take book - it's expired or already taken.");
 
             Status = ReservationStatus.Borrowed;
+
+            return new Borrow(this.ReaderId, this.CopyId);
         }
 
         public string ReaderId { get; private set; }
