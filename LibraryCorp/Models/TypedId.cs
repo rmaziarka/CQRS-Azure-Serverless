@@ -47,10 +47,19 @@ namespace LibraryCorp.Models
 
             return obj1.Equals(obj2);
         }
-
-        public static bool operator !=(TypedIdValueBase x, TypedIdValueBase y)
+        public static bool operator ==(TypedIdValueBase obj1, object obj2)
         {
-            return !(x == y);
+            return false;
+        }
+
+        public static bool operator !=(TypedIdValueBase obj1, object obj2)
+        {
+            return !(obj1 == obj2);
+        }
+
+        public static bool operator !=(TypedIdValueBase obj1, TypedIdValueBase obj2)
+        {
+            return !(obj1 == obj2);
         }
     }
 }

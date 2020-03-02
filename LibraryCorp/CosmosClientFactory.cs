@@ -26,7 +26,7 @@ namespace LibraryCorp
                 NullValueHandling = NullValueHandling.Ignore,
                 Formatting = Formatting.Indented,
                 ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor,
-                Converters = new List<JsonConverter>() { new StringEnumConverter()},
+                Converters = new List<JsonConverter>() { new StringEnumConverter(), new TypeIdConverter()},
                 ContractResolver = new PrivateResolver()
             };
 

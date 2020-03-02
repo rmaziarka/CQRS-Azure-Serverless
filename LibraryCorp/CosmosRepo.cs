@@ -45,7 +45,7 @@ namespace LibraryCorp
         {
             var iterator = _container.GetItemLinqQueryable<CosmosDocument<Copy>>()
                 .Where(x => x.PartitionKey == this._partitionKey)
-                .Where(x => x.Data.BrandId == brandId && !x.Data.IsTaken)
+                .Where(x => x.Data.BrandId == brandId.Value && !x.Data.IsTaken)
                 .Take(1)
                 .ToFeedIterator();
 
@@ -67,7 +67,7 @@ namespace LibraryCorp
         {
             var iterator = _container.GetItemLinqQueryable<CosmosDocument<Reservation>>()
                 .Where(x => x.PartitionKey == this._partitionKey)
-                .Where(x => x.Data.ReaderId == readerId && x.Data.ReservationId == reservationId)
+                .Where(x => x.Data.ReaderId == readerId.Value && x.Data.ReservationId == reservationId.Value)
                 .Take(1)
                 .ToFeedIterator();
 
